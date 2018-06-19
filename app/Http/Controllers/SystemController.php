@@ -14,13 +14,23 @@ class SystemController extends Controller{
         
     }
 
+    
+    public  function login(Request $request){
 
+    	return view("system.login",[]);
+    }
 
-    public function signup(Request $request){
+    
 
+    public function register(Request $request){
 
-    	return view("system.signup",[]);
+    	return view("system.register",[]);
     }
 
 
+
+    public function start(){
+
+    	return view("system.start",[]);
+    }
 }

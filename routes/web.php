@@ -10,23 +10,27 @@
 | and give it the Closure to call when that URI is requested.
 |
 */
-$router->group(['namespace'=> "\App\Http\Controllers",'middleware'=>['auth']], function($router){
-		
-		$router->get('/',"FilmController@list");
-
-		$router->get('/film',"FilmController@list");
-
-		$router->get('/film/{id}',"FilmController@read");
-
-		$router->put('/film',"FilmController@create");
-
-		$router->post('/film/{id}',"FilmController@update");
-
-		$router->delete('/film/{id}',"FilmController@delete");
-	}
-);
 
 
 
-$router->get('/signup',"SystemController@signup");
+
+$router->group(['middleware'=>['auth'],'namespace'=>"\App\Http\Controllers"],function($router)  {
+
+	$router->get('/',"SystemController@start");
+
+});
+
+
+$router->group(['middleware'=>['isAuthed'],'namespace'=>"\App\Http\Controllers"],function($router)  {
+
+	$router->post('/login',"SystemController@login");
+
+	$router->get('/login',"SystemController@login");
+
+	$router->get('/register',"SystemController@register");
+	
+});
+
+
+
 

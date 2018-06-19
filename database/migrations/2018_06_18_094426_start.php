@@ -17,6 +17,7 @@ class Start extends Migration
             $table->increments('id');
             $table->string('name',75);
             $table->text('description');
+            $table->integer('user_id');
             $table->timestamps();
         });
     }

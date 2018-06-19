@@ -8,6 +8,10 @@ try {
     //
 }
 
+
+
+
+
 /*
 |--------------------------------------------------------------------------
 | Create The Application
@@ -26,6 +30,10 @@ $app = new Laravel\Lumen\Application(
 $app->withFacades();
 
 $app->withEloquent();
+
+$app->withFacades(true, [
+    \Illuminate\Support\Facades\Config::class => 'Config'
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -59,16 +67,33 @@ $app->singleton(
 |
 */
 
-
 //Global middleware
-// $app->middleware([
-//    App\Http\Middleware\FilmMiddleware::class
-// ]);
+$app->middleware([
+    App\Http\Middleware\FilmMiddleware::class,
+    \Illuminate\Session\Middleware\StartSession::class,
+    \Illuminate\Cookie\Middleware\EncryptCookies::class,
+    \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+    App\Http\Middleware\VerifyCsrfToken::class,
+]);
+
 
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
+    'auth_api' => App\Http\Middleware\ApiAuthenticate::class,
+    'isAuthed'  => App\Http\Middleware\UserAuthenticated::class,
+    //'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+    //'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
+    //'can' => \Illuminate\Auth\Middleware\Authorize::class,
+    //'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+    
 ]);
+
+
+
+$app->bind(\Illuminate\Session\SessionManager::class, function () use ($app) {
+    return new \Illuminate\Session\SessionManager($app);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -84,6 +109,36 @@ $app->routeMiddleware([
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
+$app->register(\Illuminate\Session\SessionServiceProvider::class);
+$app->register(\Illuminate\Cookie\CookieServiceProvider::class);
+
+
+$app->register(Illuminate\View\ViewServiceProvider::class);
+$app->register(Illuminate\Translation\TranslationServiceProvider::class);
+$app->register(Illuminate\Validation\ValidationServiceProvider::class);
+
+
+
+
+
+
+
+$app->alias('cookie', \Illuminate\Cookie\CookieJar::class);
+$app->alias('cookie', \Illuminate\Contracts\Cookie\Factory::class);
+$app->alias('cookie', \Illuminate\Contracts\Cookie\QueueingFactory::class);
+$app->alias('session', \Illuminate\Session\SessionManager::class);
+$app->alias('session.store', \Illuminate\Session\Store::class);
+$app->alias('session.store', \Illuminate\Contracts\Session\Session::class);
+$app->alias('Route', \Illuminate\Support\Facades\Route::class);
+
+
+
+
+
+
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -101,5 +156,16 @@ $app->router->group([
 ], function ($router) {
     require __DIR__.'/../routes/web.php';
 });
+
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers\Api',
+], function ($router) {
+    require __DIR__.'/../routes/api.php';
+});
+
+
+
+$app->configure('session');
 
 return $app;

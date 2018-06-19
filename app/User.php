@@ -29,4 +29,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password',
     ];
+
+
+    public function films(){
+
+        return $this->hasMany('App\Film','user_id')
+    }
 }
